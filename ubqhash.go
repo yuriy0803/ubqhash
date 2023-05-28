@@ -129,6 +129,13 @@ type Light struct {
 	NumCaches int // Maximum number of caches to keep before eviction (only init, don't modify)
 }
 
+// compute() to get mixhash and result
+func (l *Light) Compute(blockNum uint64, hashNoNonce common.Hash, nonce uint64) (ok bool, mixDigest common.Hash, result common.Hash) {
+	cache := l.getCache(blockNum)
+	dagSize := C.ubqhash_get_datasize(C.uint64_t(blockNum))
+	return cache.compute(uint64(dagSize), hashNoNonce, nonce)
+}
+
 // Verify checks whether the block's nonce is valid.
 func (l *Light) Verify(block Block) bool {
 	// TODO: do ubqhash_quick_verify before getCache in order
